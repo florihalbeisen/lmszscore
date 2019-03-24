@@ -3,7 +3,7 @@
 ##' ´lmszscore´ calculates growth and BMI z scores using LMS reference values
 ##'
 ##' @title Calculate z scores
-##' @param mydf data frame
+##' @param mydf data frame. The data frame needs to have data on age, sex and BMI or height
 ##' @param sexcat coding of sex for male
 ##' @param sex column name of sex column e.g. "sex"
 ##' @param age column name of age column e.g. "age"
@@ -39,6 +39,26 @@ lmszscore <- function(mydf, sexcat = 0, sex = "sex", age = "age", var = "bmi" , 
 
   if (!("age" %in% colnames(lmsref) & "L" %in% colnames(lmsref) & "M" %in% colnames(lmsref) & "S" %in% colnames(lmsref))) {
     print("Refernce data needs to contain columns named age, L, M and S")
+    invisible(return(NULL))
+  }
+
+  if (!(sex %in% colnames(mydf))) {
+    print(paste0("Column \'", sex, "\' not found in ", deparse(substitute(mydf))))
+    invisible(return(NULL))
+  }
+
+  if (!(age %in% colnames(mydf))) {
+    print(paste0("Column \'", age, "\' not found in ", deparse(substitute(mydf))))
+    invisible(return(NULL))
+  }
+
+  if (!(var %in% colnames(mydf))) {
+    print(paste0("Column \'", var, "\' not found in ", deparse(substitute(mydf))))
+    invisible(return(NULL))
+  }
+
+  if (nrow(mydf[mydf[,"sex"] == sexcat,]) == 0) {
+    print(paste0("Column \'", sex, "\' has 0 rows with the category ", sexcat))
     invisible(return(NULL))
   }
 
