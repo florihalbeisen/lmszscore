@@ -8,7 +8,7 @@ lmszscore(mydf, sexcat = 0, sex = "sex", age = "age", var = "bmi",
   lmsref)
 }
 \arguments{
-\item{mydf}{data frame}
+\item{mydf}{data frame. The data frame needs to have data on age, sex and BMI or height}
 
 \item{sexcat}{coding of sex for male}
 
@@ -18,7 +18,7 @@ lmszscore(mydf, sexcat = 0, sex = "sex", age = "age", var = "bmi",
 
 \item{var}{column name of item e.g. "bmi"}
 
-\item{lmsref}{LMS reference data. Excepts sex unqiue data and needs columns named "age", "L", "M", "S"}
+\item{lmsref}{LMS reference data. Needed column "age", "L", "M", "S", data needs to be sex specific}
 }
 \value{
 The function returns a vector containing z scores

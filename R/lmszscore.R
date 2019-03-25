@@ -8,7 +8,7 @@
 ##' @param sex column name of sex column e.g. "sex"
 ##' @param age column name of age column e.g. "age"
 ##' @param var column name of item e.g. "bmi"
-##' @param lmsref LMS reference data. Excepts sex unqiue data and needs columns named "age", "L", "M", "S"
+##' @param lmsref LMS reference data. Needed column "age", "L", "M", "S", data needs to be sex specific
 ##' @return The function returns a vector containing z scores
 ##'
 ##' @examples
@@ -27,52 +27,32 @@
 ##' @export
 lmszscore <- function(mydf, sexcat = 0, sex = "sex", age = "age", var = "bmi" , lmsref){
 
-  if (missing(lmsref)) {
-    print("Please give reference values. For more information use ?lmszscore")
-    invisible(return(NULL))
-  }
-  if (missing(mydf)) {
+    # Error handling
+    if (missing(lmsref)) stop("Please give reference values. For more information use ?lmszscore")
+    if (missing(mydf))   stop("Please give a dataset. For more information use ?lmszscore")
+    if (!("age" %in% colnames(lmsref) & "L" %in% colnames(lmsref) & "M" %in% colnames(lmsref) & "S" %in% colnames(lmsref))) {
+        stop("Refernce data needs to contain columns named age, L, M and S")}
+    if (!(sex %in% colnames(mydf))) stop(paste0("Column \'", sex, "\' not found in ", deparse(substitute(mydf))))
+    if (!(age %in% colnames(mydf))) stop(paste0("Column \'", age, "\' not found in ", deparse(substitute(mydf))))
+    if (!(var %in% colnames(mydf))) stop(paste0("Column \'", var, "\' not found in ", deparse(substitute(mydf))))
+    if (nrow(mydf[mydf[,"sex"] == sexcat,]) == 0) stop(paste0("Column \'", sex, "\' has 0 rows with the category ", sexcat))
 
-    print("Please give a dataset. For more information use ?lmszscore")
-    invisible(return(NULL))
-  }
-
-  if (!("age" %in% colnames(lmsref) & "L" %in% colnames(lmsref) & "M" %in% colnames(lmsref) & "S" %in% colnames(lmsref))) {
-    print("Refernce data needs to contain columns named age, L, M and S")
-    invisible(return(NULL))
-  }
-
-  if (!(sex %in% colnames(mydf))) {
-    print(paste0("Column \'", sex, "\' not found in ", deparse(substitute(mydf))))
-    invisible(return(NULL))
-  }
-
-  if (!(age %in% colnames(mydf))) {
-    print(paste0("Column \'", age, "\' not found in ", deparse(substitute(mydf))))
-    invisible(return(NULL))
-  }
-
-  if (!(var %in% colnames(mydf))) {
-    print(paste0("Column \'", var, "\' not found in ", deparse(substitute(mydf))))
-    invisible(return(NULL))
-  }
-
-  if (nrow(mydf[mydf[,"sex"] == sexcat,]) == 0) {
-    print(paste0("Column \'", sex, "\' has 0 rows with the category ", sexcat))
-    invisible(return(NULL))
-  }
-
+    # setting variables
     ageref <- lmsref$age
     lms    <- c()
     bmiz   <- c()
     mydf <- mydf[mydf[,sex] == sexcat,]
 
+    # Looping trought all entries of the data
     for (i in 1:length(mydf[,age])) {
 
-      if (mydf$age[i] > max(ageref)) {mydf[i,age] <- max(ageref)}
+      # Setting age to max age in LMS references
+      if (mydf$age[i] > max(ageref)) {
+         mydf[i,age] <- max(ageref)
+         warning("Age > max age in LMS refernces - Age set to max LMS reference age")
+      }
 
-      ### Interpolated l,m,s values
-
+      # Interpolated l,m,s values
       dif    <- abs(mydf[i,age] - ageref)
       ind    <- rank(dif) %in% c(1,2)
 
@@ -83,9 +63,7 @@ lmszscore <- function(mydf, sexcat = 0, sex = "sex", age = "age", var = "bmi" , 
       } else if (sum(ind, na.rm = TRUE) == 1) {
         lms    <-  lmsref[ind,c("L","M","S")]
 
-      } else{
-        print("Error: Invalid number of categories")
-      }
+      } else{ stop("Error: Invalid number of categories")}
 
       bmiz <- c(bmiz,((mydf[i,var]/lms$M)^(lms$L) - 1) / (lms$S*lms$L))
 
