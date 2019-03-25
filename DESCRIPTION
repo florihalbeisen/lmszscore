@@ -6,7 +6,9 @@ Authors@R: person("Florian", "Halbeisen", email = "flori.halbeisen@gmail.com", r
 Description: Calculating z scores using LMS values
     Use four spaces when indenting paragraphs within the Description.
 Depends:
-    R (>= 3.5.0)
+    R (>= 3.0.0)
+Suggests:
+    testthat
 URL: https://github.com/florihalbeisen/lmszscore
 BugReports: https://github.com/florihalbeisen/lmszscore/issues
 License: MIT
