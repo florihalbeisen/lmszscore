@@ -49,7 +49,7 @@ lmszscore <- function(mydf, sexcat = 0, sex = "sex", age = "age", var = "bmi" , 
     for (i in 1:length(mydf[,age])) {
 
       # Setting age to max age in LMS references
-      if (mydf$age[i] > max(ageref)) {
+      if (mydf[i,age] > max(ageref)) {
          mydf[i,age] <- max(ageref)
          warning("Age > max age in LMS refernces - Age set to max LMS reference age")
       }
