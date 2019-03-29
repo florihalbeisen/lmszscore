@@ -35,13 +35,15 @@ lmszscore <- function(mydf, sexcat = 0, sex = "sex", age = "age", var = "bmi" , 
     if (!(sex %in% colnames(mydf))) stop(paste0("Column \'", sex, "\' not found in ", deparse(substitute(mydf))))
     if (!(age %in% colnames(mydf))) stop(paste0("Column \'", age, "\' not found in ", deparse(substitute(mydf))))
     if (!(var %in% colnames(mydf))) stop(paste0("Column \'", var, "\' not found in ", deparse(substitute(mydf))))
-    if (nrow(mydf[mydf[,"sex"] == sexcat,]) == 0) stop(paste0("Column \'", sex, "\' has 0 rows with the category ", sexcat))
+    if (nrow(mydf[mydf[,sex] == sexcat,]) == 0) stop(paste0("Column \'", sex, "\' has 0 rows with the category ", sexcat))
 
     # setting variables
     ageref <- lmsref$age
     lms    <- c()
     bmiz   <- c()
     mydf <- mydf[mydf[,sex] == sexcat,]
+
+    if (any(is.na(mydf[[age]]))) stop("There are some patients without age at measurment - cannot caculate BMI z-score")
 
     # Looping trought all entries of the data
     for (i in 1:length(mydf[,age])) {
@@ -63,7 +65,7 @@ lmszscore <- function(mydf, sexcat = 0, sex = "sex", age = "age", var = "bmi" , 
       } else if (sum(ind, na.rm = TRUE) == 1) {
         lms    <-  lmsref[ind,c("L","M","S")]
 
-      } else{ stop("Error: Invalid number of categories")}
+      } else{stop("Error: Invalid number of categories")}
 
       bmiz <- c(bmiz,((mydf[i,var]/lms$M)^(lms$L) - 1) / (lms$S*lms$L))
 
